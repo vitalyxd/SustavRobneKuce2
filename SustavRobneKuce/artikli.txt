@@ -1,0 +1,2 @@
+1|Ralph Lauren Majica|150.00|4|Majica
+2|Nike|200.00|20|Patike
