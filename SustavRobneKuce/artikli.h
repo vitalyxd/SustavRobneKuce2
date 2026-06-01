@@ -16,38 +16,39 @@ typedef struct {
     char kategorija[MAX_KATEGORIJA];
 } Artikl;
 
-/* ===== LINKED LIST ===== */
 typedef struct Node {
     Artikl data;
     struct Node* next;
 } Node;
 
-/* ===== GLOBALS ===== */
+
 extern Node* head;
 extern int brojArtikala;
 
-/* ===== CRUD ===== */
+
 int generirajID();
 void dodajArtikl();
 void ispisiArtikle();
 void obrisiArtikl();
 void azurirajArtikl();
 
-/* ===== DYNAMIC ARRAY ===== */
+// polje
 void ucitajArtikleUDinamickoPolje();
 
-/* ===== SORT ===== */
 void sortirajArtiklePoCijeni();
 void sortirajArtiklePoNazivu();
 
-/* ===== SEARCH ===== */
+
 void pretraziArtiklLinear(int id);
 void pretraziArtiklBSearch(int id);
 
-/* ===== LIST ===== */
+//lista
 Node* createNode(Artikl a);
 void loadList();
 void freeList();
 void cleanup();
+
+
+void ispisiListuRekurzivno(Node* current);
 
 #endif

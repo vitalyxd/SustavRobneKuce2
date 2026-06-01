@@ -1,2 +1,4 @@
-1|Ralph Lauren Majica|150.00|4|Majica
-2|Nike|200.00|20|Patike
+1|Nike patike crne|100.00|10|Patike
+3|Hlace Nike|70.00|10|Hlace
+4|Adidas patike|300.00|10|Patike
+5|Nike patike|200.00|10|Patike

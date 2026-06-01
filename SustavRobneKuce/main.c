@@ -10,39 +10,86 @@ typedef enum {
     DINAMICKO_POLJE = 4,
     AZURIRAJ = 5,
     SORT_CIJENA = 6,
-    SORT_NAZIV = 7
+    SORT_NAZIV = 7,
+    REKURZIJA = 8
 } Izbornik;
 
-int main() {
-
-    int izbor;
+int main(void)
+{
+    int izbor = -1;
 
     do {
+
         printf("\n===== ROBNA KUCA =====\n");
-        printf("1. Dodaj\n2. Ispis\n3. Obrisi\n4. Dinamicko polje\n5. Update\n6. Sort cijena\n7. Sort naziv\n0. Exit\n");
+        printf("1. Dodaj artikl\n");
+        printf("2. Ispisi artikle\n");
+        printf("3. Obrisi artikl\n");
+        printf("4. Dinamicko polje\n");
+        printf("5. Azuriraj artikl\n");
+        printf("6. Sortiraj po cijeni\n");
+        printf("7. Sortiraj po nazivu\n");
+        printf("8. Rekurzivni ispis liste\n");
+        printf("0. Izlaz\n");
+
         printf(">> ");
-        scanf("%d", &izbor);
+
+        if (scanf("%d", &izbor) != 1) {
+            printf("Neispravan unos!\n");
+            while (getchar() != '\n');
+            continue;
+        }
+
+        if (izbor < 0 || izbor > 8) {
+            printf("Neispravan izbor!\n");
+            continue;
+        }
 
         switch (izbor) {
 
-        case DODAJ: dodajArtikl(); break;
-        case ISPIS: ispisiArtikle(); break;
-        case OBRISI: obrisiArtikl(); break;
-        case DINAMICKO_POLJE: ucitajArtikleUDinamickoPolje(); break;
-        case AZURIRAJ: azurirajArtikl(); break;
-        case SORT_CIJENA: sortirajArtiklePoCijeni(); break;
-        case SORT_NAZIV: sortirajArtiklePoNazivu(); break;
+        case DODAJ:
+            dodajArtikl();
+            break;
+
+        case ISPIS:
+            ispisiArtikle();
+            break;
+
+        case OBRISI:
+            obrisiArtikl();
+            break;
+
+        case DINAMICKO_POLJE:
+            ucitajArtikleUDinamickoPolje();
+            break;
+
+        case AZURIRAJ:
+            azurirajArtikl();
+            break;
+
+        case SORT_CIJENA:
+            sortirajArtiklePoCijeni();
+            break;
+
+        case SORT_NAZIV:
+            sortirajArtiklePoNazivu();
+            break;
+
+        case REKURZIJA:
+            loadList();
+
+            printf("\nREKURZIVNI ISPIS:\n");
+            ispisiListuRekurzivno(head);
+
+            freeList();
+            break;
 
         case IZLAZ:
             cleanup();
-            printf("Exit...\n");
+            printf("Izlaz iz programa.\n");
             break;
-
-        default:
-            printf("Krivi unos\n");
         }
 
-    } while (izbor != 0);
+    } while (izbor != IZLAZ);
 
     return 0;
 }

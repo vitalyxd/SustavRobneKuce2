@@ -1,11 +1,13 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "artikli.h"
 
-/* ===== GLOBALS ===== */
+
 Node* head = NULL;
 int brojArtikala = 0;
 
-/* ===== NODE ===== */
+static int brojPoziva = 0;
+
+
 Node* createNode(Artikl a) {
 
     Node* n = (Node*)malloc(sizeof(Node));
@@ -13,10 +15,11 @@ Node* createNode(Artikl a) {
 
     n->data = a;
     n->next = NULL;
+
     return n;
 }
 
-/* ===== ID ===== */
+
 int generirajID() {
 
     FILE* fp = fopen("artikli.txt", "r");
@@ -25,7 +28,8 @@ int generirajID() {
     Artikl t;
     int last = 0;
 
-    while (fscanf(fp, "%d|%49[^|]|%f|%d|%29[^\n]\n",
+    while (fscanf(fp,
+        "%d|%49[^|]|%f|%d|%29[^\n]\n",
         &t.id, t.naziv, &t.cijena, &t.kolicina, t.kategorija) == 5) {
         last = t.id;
     }
@@ -34,11 +38,16 @@ int generirajID() {
     return last + 1;
 }
 
-/* ===== CREATE ===== */
+
 void dodajArtikl() {
 
+    brojPoziva++;
+
     FILE* fp = fopen("artikli.txt", "a");
-    if (!fp) return;
+    if (!fp) {
+        perror("FILE ERROR");
+        return;
+    }
 
     Artikl a;
     a.id = generirajID();
@@ -57,13 +66,14 @@ void dodajArtikl() {
     printf("Kategorija: ");
     scanf(" %29[^\n]", a.kategorija);
 
-    fprintf(fp, "%d|%s|%.2f|%d|%s\n",
-        a.id, a.naziv, a.cijena, a.kolicina, a.kategorija);
+    fprintf(fp, "%d|%s|%.2f|%d|%s\n", a.id, a.naziv, a.cijena, a.kolicina, a.kategorija);
 
     fclose(fp);
+
+    printf("Broj dodavanja: %d\n", brojPoziva);
 }
 
-/* ===== READ ===== */
+
 void ispisiArtikle() {
 
     FILE* fp = fopen("artikli.txt", "r");
@@ -71,23 +81,25 @@ void ispisiArtikle() {
 
     Artikl a;
 
-    while (fscanf(fp, "%d|%49[^|]|%f|%d|%29[^\n]\n",
-        &a.id, a.naziv, &a.cijena, &a.kolicina, a.kategorija) == 5) {
+    while (fscanf(fp,
+        "%d|%49[^|]|%f|%d|%29[^\n]\n", &a.id, a.naziv, &a.cijena, &a.kolicina, a.kategorija) == 5) {
 
-        printf("\n%d | %s | %.2f | %d | %s",
-            a.id, a.naziv, a.cijena, a.kolicina, a.kategorija);
+        printf("\n%d | %s | %.2f | %d | %s", a.id, a.naziv, a.cijena, a.kolicina, a.kategorija);
     }
 
     fclose(fp);
 }
 
-/* ===== DELETE ===== */
+
 void obrisiArtikl() {
 
     FILE* fp = fopen("artikli.txt", "r");
     FILE* tmp = fopen("temp.txt", "w");
 
-    if (!fp || !tmp) return;
+    if (!fp || !tmp) {
+        perror("FILE ERROR");
+        return;
+    }
 
     int id;
     printf("ID za brisanje: ");
@@ -96,16 +108,15 @@ void obrisiArtikl() {
     Artikl a;
     int found = 0;
 
-    while (fscanf(fp, "%d|%49[^|]|%f|%d|%29[^\n]\n",
-        &a.id, a.naziv, &a.cijena, &a.kolicina, a.kategorija) == 5) {
+    while (fscanf(fp,
+        "%d|%49[^|]|%f|%d|%29[^\n]\n", &a.id, a.naziv, &a.cijena, &a.kolicina, a.kategorija) == 5) {
 
         if (a.id == id) {
             found = 1;
             continue;
         }
 
-        fprintf(tmp, "%d|%s|%.2f|%d|%s\n",
-            a.id, a.naziv, a.cijena, a.kolicina, a.kategorija);
+        fprintf(tmp, "%d|%s|%.2f|%d|%s\n", a.id, a.naziv, a.cijena, a.kolicina, a.kategorija);
     }
 
     fclose(fp);
@@ -117,13 +128,16 @@ void obrisiArtikl() {
     printf(found ? "Obrisano\n" : "Nije nadeno\n");
 }
 
-/* ===== UPDATE (FIXED + SAFE) ===== */
+
 void azurirajArtikl() {
 
     FILE* fp = fopen("artikli.txt", "r");
     FILE* tmp = fopen("temp.txt", "w");
 
-    if (!fp || !tmp) return;
+    if (!fp || !tmp) {
+        perror("FILE ERROR");
+        return;
+    }
 
     int id;
     printf("ID za update: ");
@@ -132,8 +146,7 @@ void azurirajArtikl() {
     Artikl a;
     int found = 0;
 
-    while (fscanf(fp, "%d|%49[^|]|%f|%d|%29[^\n]\n",
-        &a.id, a.naziv, &a.cijena, &a.kolicina, a.kategorija) == 5) {
+    while (fscanf(fp,"%d|%49[^|]|%f|%d|%29[^\n]\n", &a.id, a.naziv, &a.cijena, &a.kolicina, a.kategorija) == 5) {
 
         if (a.id == id) {
             found = 1;
@@ -151,8 +164,7 @@ void azurirajArtikl() {
             scanf(" %29[^\n]", a.kategorija);
         }
 
-        fprintf(tmp, "%d|%s|%.2f|%d|%s\n",
-            a.id, a.naziv, a.cijena, a.kolicina, a.kategorija);
+        fprintf(tmp, "%d|%s|%.2f|%d|%s\n", a.id, a.naziv, a.cijena, a.kolicina, a.kategorija);
     }
 
     fclose(fp);
@@ -164,7 +176,7 @@ void azurirajArtikl() {
     printf(found ? "UPDATE OK\n" : "NOT FOUND\n");
 }
 
-/* ===== DYNAMIC ARRAY (FIXED SYMBOL EXPORT ISSUE) ===== */
+// dinamicka lista
 void ucitajArtikleUDinamickoPolje() {
 
     FILE* fp = fopen("artikli.txt", "r");
@@ -174,8 +186,7 @@ void ucitajArtikleUDinamickoPolje() {
     int n = 0;
     Artikl t;
 
-    while (fscanf(fp, "%d|%49[^|]|%f|%d|%29[^\n]\n",
-        &t.id, t.naziv, &t.cijena, &t.kolicina, t.kategorija) == 5) {
+    while (fscanf(fp,"%d|%49[^|]|%f|%d|%29[^\n]\n", &t.id, t.naziv, &t.cijena, &t.kolicina, t.kategorija) == 5) {
 
         Artikl* tmp = realloc(arr, (n + 1) * sizeof(Artikl));
         if (!tmp) {
@@ -193,19 +204,16 @@ void ucitajArtikleUDinamickoPolje() {
     printf("\nDINAMICKO POLJE:\n");
 
     for (int i = 0; i < n; i++) {
-        printf("%d | %s | %.2f | %d | %s\n",
-            arr[i].id, arr[i].naziv, arr[i].cijena,
-            arr[i].kolicina, arr[i].kategorija);
+        printf("%d | %s | %.2f | %d | %s\n",arr[i].id, arr[i].naziv, arr[i].cijena,arr[i].kolicina, arr[i].kategorija);
     }
 
     free(arr);
 }
 
-/* ===== SORT ===== */
+// usporedba
 int cmpCijena(const void* a, const void* b) {
     float x = ((Artikl*)a)->cijena;
     float y = ((Artikl*)b)->cijena;
-
     return (x > y) - (x < y);
 }
 
@@ -213,6 +221,7 @@ int cmpNaziv(const void* a, const void* b) {
     return strcmp(((Artikl*)a)->naziv,
         ((Artikl*)b)->naziv);
 }
+
 
 void sortirajArtiklePoCijeni() {
 
@@ -223,10 +232,16 @@ void sortirajArtiklePoCijeni() {
     int n = 0;
     Artikl t;
 
-    while (fscanf(fp, "%d|%49[^|]|%f|%d|%29[^\n]\n",
-        &t.id, t.naziv, &t.cijena, &t.kolicina, t.kategorija) == 5) {
+    while (fscanf(fp,"%d|%49[^|]|%f|%d|%29[^\n]\n",&t.id, t.naziv, &t.cijena, &t.kolicina, t.kategorija) == 5) {
 
-        arr = realloc(arr, (n + 1) * sizeof(Artikl));
+        Artikl* tmp = realloc(arr, (n + 1) * sizeof(Artikl));
+        if (!tmp) {
+            free(arr);
+            fclose(fp);
+            return;
+        }
+
+        arr = tmp;
         arr[n++] = t;
     }
 
@@ -237,7 +252,7 @@ void sortirajArtiklePoCijeni() {
     printf("\nSORT CIJENA:\n");
 
     for (int i = 0; i < n; i++)
-        printf("%d | %s | %.2f\n", arr[i].id, arr[i].naziv, arr[i].cijena);
+        printf("%d | %s | %.2f\n",arr[i].id, arr[i].naziv, arr[i].cijena);
 
     free(arr);
 }
@@ -251,10 +266,16 @@ void sortirajArtiklePoNazivu() {
     int n = 0;
     Artikl t;
 
-    while (fscanf(fp, "%d|%49[^|]|%f|%d|%29[^\n]\n",
-        &t.id, t.naziv, &t.cijena, &t.kolicina, t.kategorija) == 5) {
+    while (fscanf(fp,"%d|%49[^|]|%f|%d|%29[^\n]\n", &t.id, t.naziv, &t.cijena, &t.kolicina, t.kategorija) == 5) {
 
-        arr = realloc(arr, (n + 1) * sizeof(Artikl));
+        Artikl* tmp = realloc(arr, (n + 1) * sizeof(Artikl));
+        if (!tmp) {
+            free(arr);
+            fclose(fp);
+            return;
+        }
+
+        arr = tmp;
         arr[n++] = t;
     }
 
@@ -270,7 +291,7 @@ void sortirajArtiklePoNazivu() {
     free(arr);
 }
 
-/* ===== SEARCH ===== */
+
 void pretraziArtiklLinear(int id) {
 
     FILE* fp = fopen("artikli.txt", "r");
@@ -278,8 +299,7 @@ void pretraziArtiklLinear(int id) {
 
     Artikl a;
 
-    while (fscanf(fp, "%d|%49[^|]|%f|%d|%29[^\n]\n",
-        &a.id, a.naziv, &a.cijena, &a.kolicina, a.kategorija) == 5) {
+    while (fscanf(fp,"%d|%49[^|]|%f|%d|%29[^\n]\n", &a.id, a.naziv, &a.cijena, &a.kolicina, a.kategorija) == 5) {
 
         if (a.id == id) {
             printf("FOUND: %s\n", a.naziv);
@@ -305,10 +325,16 @@ void pretraziArtiklBSearch(int id) {
     int n = 0;
     Artikl t;
 
-    while (fscanf(fp, "%d|%49[^|]|%f|%d|%29[^\n]\n",
-        &t.id, t.naziv, &t.cijena, &t.kolicina, t.kategorija) == 5) {
+    while (fscanf(fp,"%d|%49[^|]|%f|%d|%29[^\n]\n", &t.id, t.naziv, &t.cijena, &t.kolicina, t.kategorija) == 5) {
 
-        arr = realloc(arr, (n + 1) * sizeof(Artikl));
+        Artikl* tmp = realloc(arr, (n + 1) * sizeof(Artikl));
+        if (!tmp) {
+            free(arr);
+            fclose(fp);
+            return;
+        }
+
+        arr = tmp;
         arr[n++] = t;
     }
 
@@ -316,7 +342,7 @@ void pretraziArtiklBSearch(int id) {
 
     qsort(arr, n, sizeof(Artikl), cmpID);
 
-    Artikl key = { id };
+    Artikl key = { id, "", 0, 0, "" };
 
     Artikl* res = bsearch(&key, arr, n, sizeof(Artikl), cmpID);
 
@@ -325,7 +351,7 @@ void pretraziArtiklBSearch(int id) {
     free(arr);
 }
 
-/* ===== LIST ===== */
+
 void loadList() {
 
     FILE* fp = fopen("artikli.txt", "r");
@@ -333,8 +359,7 @@ void loadList() {
 
     Artikl t;
 
-    while (fscanf(fp, "%d|%49[^|]|%f|%d|%29[^\n]\n",
-        &t.id, t.naziv, &t.cijena, &t.kolicina, t.kategorija) == 5) {
+    while (fscanf(fp, "%d|%49[^|]|%f|%d|%29[^\n]\n", &t.id, t.naziv, &t.cijena, &t.kolicina, t.kategorija) == 5) {
 
         Node* n = createNode(t);
         if (!n) continue;
@@ -359,4 +384,20 @@ void freeList() {
 
 void cleanup() {
     freeList();
+}
+
+
+void ispisiListuRekurzivno(Node* current) {
+
+    if (current == NULL)
+        return;
+
+    printf("%d | %s | %.2f | %d | %s\n", 
+        current->data.id,
+        current->data.naziv,
+        current->data.cijena,
+        current->data.kolicina,
+        current->data.kategorija);
+
+    ispisiListuRekurzivno(current->next);
 }
